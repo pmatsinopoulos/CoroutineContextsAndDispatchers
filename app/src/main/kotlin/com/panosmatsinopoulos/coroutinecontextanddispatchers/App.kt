@@ -3,26 +3,16 @@
  */
 package com.panosmatsinopoulos.coroutinecontextanddispatchers
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-@OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 fun main() {
+    println("Main ${Thread.currentThread().name}")
     runBlocking {
         launch {
-            println("main runBlocking                             : I'm working in thread ${Thread.currentThread().name}")
-            delay(1_000L)
-            println("   main runBlocking                          : I'm working in thread ${Thread.currentThread().name}")
-        }
-        launch(Dispatchers.Unconfined) {
-            println("main runBlocking unconfined                  : I'm working in thread ${Thread.currentThread().name}")
-            delay(500L)
-            println("   main runBlocking unconfined               : I'm working in thread ${Thread.currentThread().name}")
-        }
-        launch(Dispatchers.Default) {
-            println("main runBlocking default                     : I'm working in thread ${Thread.currentThread().name}")
-        }
-        launch(newSingleThreadContext("MyOwnThread")) {
-            println("main runBlocking newSingleThreadContext      : I'm working in thread ${Thread.currentThread().name}")
+            println("in launch: context: $coroutineContext}, thread: ${Thread.currentThread().name}, job: ${coroutineContext[Job]}")
         }
     }
+    println("Main ending")
 }

@@ -3,13 +3,26 @@
  */
 package com.panosmatsinopoulos.coroutinecontextanddispatchers
 
-class App {
-    val greeting: String
-        get() {
-            return "Hello World!"
-        }
-}
+import kotlinx.coroutines.*
 
+@OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 fun main() {
-    println(App().greeting)
+    runBlocking {
+        launch {
+            println("main runBlocking                             : I'm working in thread ${Thread.currentThread().name}")
+            delay(1_000L)
+            println("   main runBlocking                          : I'm working in thread ${Thread.currentThread().name}")
+        }
+        launch(Dispatchers.Unconfined) {
+            println("main runBlocking unconfined                  : I'm working in thread ${Thread.currentThread().name}")
+            delay(500L)
+            println("   main runBlocking unconfined               : I'm working in thread ${Thread.currentThread().name}")
+        }
+        launch(Dispatchers.Default) {
+            println("main runBlocking default                     : I'm working in thread ${Thread.currentThread().name}")
+        }
+        launch(newSingleThreadContext("MyOwnThread")) {
+            println("main runBlocking newSingleThreadContext      : I'm working in thread ${Thread.currentThread().name}")
+        }
+    }
 }

@@ -3,7 +3,6 @@
  */
 package com.panosmatsinopoulos.coroutinecontextanddispatchers
 
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -12,22 +11,17 @@ fun main() {
     println("Main ${Thread.currentThread().name}")
     runBlocking {
         val request = launch {
-            launch(Job()) {
-                println("job1: I run in my own Job and execute independently!")
-                delay(1_000L)
-                println("job1: I am not affected by cancellation of the request")
+            repeat(3) {
+                launch {
+                    delay((it + 1) * 500L)
+                    println("Coroutine $it")
+                }
             }
-            launch {
-                delay(100L)
-                println("job2: I am a child of the request coroutine")
-                delay(1_000L)
-                println("job2: I will not execute this line if my parent cancels before this")
-            }
+            // A parent coroutine may end before its children do.
+            println("request: I am done and I don't have to explicitly join my children who are still active.")
         }
-        delay(500L)
-        request.cancel()
-        println("main: Who has survived request cancellation?")
-        delay(1_000L)
+        request.join()
+        println("Processing of the request is complete")
     }
     println("Main ending")
 }

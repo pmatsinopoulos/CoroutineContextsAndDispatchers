@@ -3,6 +3,7 @@
  */
 package com.panosmatsinopoulos.coroutinecontextanddispatchers
 
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -12,9 +13,9 @@ fun main() {
     runBlocking {
         val request = launch {
             repeat(3) {
-                launch {
+                launch(CoroutineName("Foo$it")) {
                     delay((it + 1) * 500L)
-                    println("Coroutine $it")
+                    println("Coroutine $it, thread: ${Thread.currentThread().name}")
                 }
             }
             // A parent coroutine may end before its children do.

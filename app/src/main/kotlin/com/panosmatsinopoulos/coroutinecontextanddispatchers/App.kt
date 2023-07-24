@@ -3,26 +3,35 @@
  */
 package com.panosmatsinopoulos.coroutinecontextanddispatchers
 
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+
+class Activity {
+    private val mainScope = CoroutineScope(Dispatchers.Default)
+
+    fun destroy() {
+        mainScope.cancel()
+    }
+
+    fun doSomething() {
+        repeat(10) {
+            mainScope.launch {
+                println("Running $it (${Thread.currentThread().name})...")
+                delay((it + 1) * 500L)
+                println("...ending $it (${Thread.currentThread().name})")
+            }
+        }
+    }
+}
 
 fun main() {
     println("Main ${Thread.currentThread().name}")
+    val activity = Activity()
     runBlocking {
-        val request = launch {
-            repeat(3) {
-                launch(CoroutineName("Foo$it")) {
-                    delay((it + 1) * 500L)
-                    println("Coroutine $it, thread: ${Thread.currentThread().name}")
-                }
-            }
-            // A parent coroutine may end before its children do.
-            println("request: I am done and I don't have to explicitly join my children who are still active.")
-        }
-        request.join()
-        println("Processing of the request is complete")
+        activity.doSomething()
+        println("Launched coroutines")
+        delay(1_000L)
+        println("Destroying activity before coroutines finish")
+        activity.destroy()
     }
     println("Main ending")
 }
